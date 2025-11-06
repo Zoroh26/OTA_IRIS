@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from .admin.initialize import create_admin_interface
@@ -27,8 +27,15 @@ async def lifespan_with_admin(app: FastAPI) -> AsyncGenerator[None, None]:
         yield
 
 
-app = create_application(router=router, settings=settings, lifespan=lifespan_with_admin)
-
+app = create_application(router=router, settings=settings,
+                         lifespan=lifespan_with_admin)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 # Mount admin interface if enabled
 if admin:
     app.mount(settings.CRUD_ADMIN_MOUNT_PATH, admin.app)

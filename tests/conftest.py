@@ -17,7 +17,8 @@ DATABASE_URI = settings.POSTGRES_URI
 DATABASE_PREFIX = settings.POSTGRES_SYNC_PREFIX
 
 sync_engine = create_engine(DATABASE_PREFIX + DATABASE_URI)
-local_session = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
+local_session = sessionmaker(
+    autocommit=False, autoflush=False, bind=sync_engine)
 
 
 fake = Faker()
@@ -86,7 +87,6 @@ def sample_user_read():
         is_superuser=False,
         created_at=fake.date_time(),
         updated_at=fake.date_time(),
-        tier_id=None,
     )
 
 

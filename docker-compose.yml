@@ -19,6 +19,8 @@ services:
     volumes:
       - ./src/app:/code/app
       - ./src/.env:/code/.env
+      - ./src/migrations:/code/migrations
+      - ./src/alembic.ini:/code/alembic.ini
 
   worker:
     build:
@@ -38,11 +40,13 @@ services:
     image: postgres:13
     env_file:
       - ./src/.env
+    ports:
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     # -------- replace with comment to run migrations with docker --------
-    expose:
-      - "5432"
+    # expose:
+    #   - "5432"
     # ports:
     #  - 5432:5432
 
@@ -53,19 +57,19 @@ services:
     expose:
       - "6379"
 
-  #-------- uncomment to run with pgadmin --------
-  # pgadmin:
-  #   container_name: pgadmin4
-  #   image: dpage/pgadmin4:latest
-  #   restart: always
-  #   ports:
-  #     - "5050:80"
-  #   volumes:
-  #     - pgadmin-data:/var/lib/pgadmin
-  #   env_file:
-  #     - ./src/.env
-  #   depends_on:
-  #     - db
+  
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4:latest
+    restart: always
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    env_file:
+      - ./src/.env
+    depends_on:
+      - db
 
   #-------- uncomment to run with nginx --------
   # nginx:
@@ -108,4 +112,4 @@ services:
 volumes:
   postgres-data:
   redis-data:
-  #pgadmin-data:
+  pgadmin-data:

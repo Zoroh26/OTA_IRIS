@@ -22,8 +22,10 @@ class AppSettings(BaseSettings):
 class CryptSettings(BaseSettings):
     SECRET_KEY: SecretStr = config("SECRET_KEY", cast=SecretStr)
     ALGORITHM: str = config("ALGORITHM", default="HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = config("ACCESS_TOKEN_EXPIRE_MINUTES", default=30)
-    REFRESH_TOKEN_EXPIRE_DAYS: int = config("REFRESH_TOKEN_EXPIRE_DAYS", default=7)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = config(
+        "ACCESS_TOKEN_EXPIRE_MINUTES", default=30)
+    REFRESH_TOKEN_EXPIRE_DAYS: int = config(
+        "REFRESH_TOKEN_EXPIRE_DAYS", default=7)
 
 
 class DatabaseSettings(BaseSettings):
@@ -32,8 +34,10 @@ class DatabaseSettings(BaseSettings):
 
 class SQLiteSettings(DatabaseSettings):
     SQLITE_URI: str = config("SQLITE_URI", default="./sql_app.db")
-    SQLITE_SYNC_PREFIX: str = config("SQLITE_SYNC_PREFIX", default="sqlite:///")
-    SQLITE_ASYNC_PREFIX: str = config("SQLITE_ASYNC_PREFIX", default="sqlite+aiosqlite:///")
+    SQLITE_SYNC_PREFIX: str = config(
+        "SQLITE_SYNC_PREFIX", default="sqlite:///")
+    SQLITE_ASYNC_PREFIX: str = config(
+        "SQLITE_ASYNC_PREFIX", default="sqlite+aiosqlite:///")
 
 
 class MySQLSettings(DatabaseSettings):
@@ -44,7 +48,8 @@ class MySQLSettings(DatabaseSettings):
     MYSQL_DB: str = config("MYSQL_DB", default="dbname")
     MYSQL_URI: str = f"{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_SERVER}:{MYSQL_PORT}/{MYSQL_DB}"
     MYSQL_SYNC_PREFIX: str = config("MYSQL_SYNC_PREFIX", default="mysql://")
-    MYSQL_ASYNC_PREFIX: str = config("MYSQL_ASYNC_PREFIX", default="mysql+aiomysql://")
+    MYSQL_ASYNC_PREFIX: str = config(
+        "MYSQL_ASYNC_PREFIX", default="mysql+aiomysql://")
     MYSQL_URL: str | None = config("MYSQL_URL", default=None)
 
 
@@ -54,8 +59,10 @@ class PostgresSettings(DatabaseSettings):
     POSTGRES_SERVER: str = config("POSTGRES_SERVER", default="localhost")
     POSTGRES_PORT: int = config("POSTGRES_PORT", default=5432)
     POSTGRES_DB: str = config("POSTGRES_DB", default="postgres")
-    POSTGRES_SYNC_PREFIX: str = config("POSTGRES_SYNC_PREFIX", default="postgresql://")
-    POSTGRES_ASYNC_PREFIX: str = config("POSTGRES_ASYNC_PREFIX", default="postgresql+asyncpg://")
+    POSTGRES_SYNC_PREFIX: str = config(
+        "POSTGRES_SYNC_PREFIX", default="postgresql://")
+    POSTGRES_ASYNC_PREFIX: str = config(
+        "POSTGRES_ASYNC_PREFIX", default="postgresql+asyncpg://")
     POSTGRES_URI: str = f"{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
     POSTGRES_URL: str | None = config("POSTGRES_URL", default=None)
 
@@ -64,10 +71,12 @@ class FirstUserSettings(BaseSettings):
     ADMIN_NAME: str = config("ADMIN_NAME", default="admin")
     ADMIN_EMAIL: str = config("ADMIN_EMAIL", default="admin@admin.com")
     ADMIN_USERNAME: str = config("ADMIN_USERNAME", default="admin")
-    ADMIN_PASSWORD: str = config("ADMIN_PASSWORD", default="!Ch4ng3Th1sP4ssW0rd!")
+    ADMIN_PASSWORD: str = config(
+        "ADMIN_PASSWORD", default="!Ch4ng3Th1sP4ssW0rd!")
 
 
-class TestSettings(BaseSettings): ...
+class TestSettings(BaseSettings):
+    ...
 
 
 class RedisCacheSettings(BaseSettings):
@@ -85,35 +94,33 @@ class RedisQueueSettings(BaseSettings):
     REDIS_QUEUE_PORT: int = config("REDIS_QUEUE_PORT", default=6379)
 
 
-class RedisRateLimiterSettings(BaseSettings):
-    REDIS_RATE_LIMIT_HOST: str = config("REDIS_RATE_LIMIT_HOST", default="localhost")
-    REDIS_RATE_LIMIT_PORT: int = config("REDIS_RATE_LIMIT_PORT", default=6379)
-    REDIS_RATE_LIMIT_URL: str = f"redis://{REDIS_RATE_LIMIT_HOST}:{REDIS_RATE_LIMIT_PORT}"
-
-
-class DefaultRateLimitSettings(BaseSettings):
-    DEFAULT_RATE_LIMIT_LIMIT: int = config("DEFAULT_RATE_LIMIT_LIMIT", default=10)
-    DEFAULT_RATE_LIMIT_PERIOD: int = config("DEFAULT_RATE_LIMIT_PERIOD", default=3600)
-
-
 class CRUDAdminSettings(BaseSettings):
     CRUD_ADMIN_ENABLED: bool = config("CRUD_ADMIN_ENABLED", default=True)
-    CRUD_ADMIN_MOUNT_PATH: str = config("CRUD_ADMIN_MOUNT_PATH", default="/admin")
+    CRUD_ADMIN_MOUNT_PATH: str = config(
+        "CRUD_ADMIN_MOUNT_PATH", default="/admin")
 
     CRUD_ADMIN_ALLOWED_IPS_LIST: list[str] | None = None
     CRUD_ADMIN_ALLOWED_NETWORKS_LIST: list[str] | None = None
-    CRUD_ADMIN_MAX_SESSIONS: int = config("CRUD_ADMIN_MAX_SESSIONS", default=10)
-    CRUD_ADMIN_SESSION_TIMEOUT: int = config("CRUD_ADMIN_SESSION_TIMEOUT", default=1440)
-    SESSION_SECURE_COOKIES: bool = config("SESSION_SECURE_COOKIES", default=True)
+    CRUD_ADMIN_MAX_SESSIONS: int = config(
+        "CRUD_ADMIN_MAX_SESSIONS", default=10)
+    CRUD_ADMIN_SESSION_TIMEOUT: int = config(
+        "CRUD_ADMIN_SESSION_TIMEOUT", default=1440)
+    SESSION_SECURE_COOKIES: bool = config(
+        "SESSION_SECURE_COOKIES", default=True)
 
-    CRUD_ADMIN_TRACK_EVENTS: bool = config("CRUD_ADMIN_TRACK_EVENTS", default=True)
-    CRUD_ADMIN_TRACK_SESSIONS: bool = config("CRUD_ADMIN_TRACK_SESSIONS", default=True)
+    CRUD_ADMIN_TRACK_EVENTS: bool = config(
+        "CRUD_ADMIN_TRACK_EVENTS", default=True)
+    CRUD_ADMIN_TRACK_SESSIONS: bool = config(
+        "CRUD_ADMIN_TRACK_SESSIONS", default=True)
 
-    CRUD_ADMIN_REDIS_ENABLED: bool = config("CRUD_ADMIN_REDIS_ENABLED", default=False)
-    CRUD_ADMIN_REDIS_HOST: str = config("CRUD_ADMIN_REDIS_HOST", default="localhost")
+    CRUD_ADMIN_REDIS_ENABLED: bool = config(
+        "CRUD_ADMIN_REDIS_ENABLED", default=False)
+    CRUD_ADMIN_REDIS_HOST: str = config(
+        "CRUD_ADMIN_REDIS_HOST", default="localhost")
     CRUD_ADMIN_REDIS_PORT: int = config("CRUD_ADMIN_REDIS_PORT", default=6379)
     CRUD_ADMIN_REDIS_DB: int = config("CRUD_ADMIN_REDIS_DB", default=0)
-    CRUD_ADMIN_REDIS_PASSWORD: str | None = config("CRUD_ADMIN_REDIS_PASSWORD", default="None")
+    CRUD_ADMIN_REDIS_PASSWORD: str | None = config(
+        "CRUD_ADMIN_REDIS_PASSWORD", default="None")
     CRUD_ADMIN_REDIS_SSL: bool = config("CRUD_ADMIN_REDIS_SSL", default=False)
 
 
@@ -124,7 +131,8 @@ class EnvironmentOption(Enum):
 
 
 class EnvironmentSettings(BaseSettings):
-    ENVIRONMENT: EnvironmentOption = config("ENVIRONMENT", default=EnvironmentOption.LOCAL)
+    ENVIRONMENT: EnvironmentOption = config(
+        "ENVIRONMENT", default=EnvironmentOption.LOCAL)
 
 
 class Settings(
@@ -137,8 +145,6 @@ class Settings(
     RedisCacheSettings,
     ClientSideCacheSettings,
     RedisQueueSettings,
-    RedisRateLimiterSettings,
-    DefaultRateLimitSettings,
     CRUDAdminSettings,
     EnvironmentSettings,
 ):

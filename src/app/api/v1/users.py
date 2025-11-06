@@ -8,11 +8,8 @@ from ...api.dependencies import get_current_superuser, get_current_user
 from ...core.db.database import async_get_db
 from ...core.exceptions.http_exceptions import DuplicateValueException, ForbiddenException, NotFoundException
 from ...core.security import blacklist_token, get_password_hash, oauth2_scheme
-from ...crud.crud_rate_limit import crud_rate_limits
-from ...crud.crud_tier import crud_tiers
 from ...crud.crud_users import crud_users
-from ...schemas.tier import TierRead
-from ...schemas.user import UserCreate, UserCreateInternal, UserRead, UserTierUpdate, UserUpdate
+from ...schemas.user import UserCreate, UserCreateInternal, UserRead, UserUpdate
 
 router = APIRouter(tags=["users"])
 
@@ -30,7 +27,8 @@ async def write_user(
         raise DuplicateValueException("Username not available")
 
     user_internal_dict = user.model_dump()
-    user_internal_dict["hashed_password"] = get_password_hash(password=user_internal_dict["password"])
+    user_internal_dict["hashed_password"] = get_password_hash(
+        password=user_internal_dict["password"])
     del user_internal_dict["password"]
 
     user_internal = UserCreateInternal(**user_internal_dict)
@@ -54,7 +52,8 @@ async def read_users(
         is_deleted=False,
     )
 
-    response: dict[str, Any] = paginated_response(crud_data=users_data, page=page, items_per_page=items_per_page)
+    response: dict[str, Any] = paginated_response(
+        crud_data=users_data, page=page, items_per_page=items_per_page)
     return response
 
 
@@ -70,7 +69,6 @@ async def read_user(request: Request, username: str, db: Annotated[AsyncSession,
         raise NotFoundException("User not found")
 
     return cast(UserRead, db_user)
-
 
 
 @router.patch("/user/{username}")
@@ -98,7 +96,7 @@ async def patch_user(
     if values.email is not None and values.email != db_email:
         if await crud_users.exists(db=db, email=values.email):
             raise DuplicateValueException("Email is already registered")
- 
+
     if values.username is not None and values.username != db_username:
         if await crud_users.exists(db=db, username=values.username):
             raise DuplicateValueException("Username not available")
@@ -141,73 +139,3 @@ async def erase_db_user(
     await crud_users.db_delete(db=db, username=username)
     await blacklist_token(token=token, db=db)
     return {"message": "User deleted from the database"}
-
-
-@router.get("/user/{username}/rate_limits", dependencies=[Depends(get_current_superuser)])
-async def read_user_rate_limits(
-    request: Request, username: str, db: Annotated[AsyncSession, Depends(async_get_db)]
-) -> dict[str, Any]:
-    db_user = await crud_users.get(db=db, username=username, schema_to_select=UserRead)
-    if db_user is None:
-        raise NotFoundException("User not found")
-
-    db_user = cast(UserRead, db_user)
-    user_dict = db_user.model_dump()
-    if db_user.tier_id is None:
-        user_dict["tier_rate_limits"] = []
-        return user_dict
-
-    db_tier = await crud_tiers.get(db=db, id=db_user.tier_id, schema_to_select=TierRead)
-    if db_tier is None:
-        raise NotFoundException("Tier not found")
-
-    db_tier = cast(TierRead, db_tier)
-    db_rate_limits = await crud_rate_limits.get_multi(db=db, tier_id=db_tier.id)
-
-    user_dict["tier_rate_limits"] = db_rate_limits["data"]
-
-    return user_dict
-
-
-@router.get("/user/{username}/tier")
-async def read_user_tier(
-    request: Request, username: str, db: Annotated[AsyncSession, Depends(async_get_db)]
-) -> dict | None:
-    db_user = await crud_users.get(db=db, username=username, schema_to_select=UserRead)
-    if db_user is None:
-        raise NotFoundException("User not found")
-
-    db_user = cast(UserRead, db_user)
-    if db_user.tier_id is None:
-        return None
-
-    db_tier = await crud_tiers.get(db=db, id=db_user.tier_id, schema_to_select=TierRead)
-    if not db_tier:
-        raise NotFoundException("Tier not found")
-
-    db_tier = cast(TierRead, db_tier)
-
-    user_dict = db_user.model_dump()
-    tier_dict = db_tier.model_dump()
-
-    for key, value in tier_dict.items():
-        user_dict[f"tier_{key}"] = value
-
-    return user_dict
-
-
-@router.patch("/user/{username}/tier", dependencies=[Depends(get_current_superuser)])
-async def patch_user_tier(
-    request: Request, username: str, values: UserTierUpdate, db: Annotated[AsyncSession, Depends(async_get_db)]
-) -> dict[str, str]:
-    db_user = await crud_users.get(db=db, username=username, schema_to_select=UserRead)
-    if db_user is None:
-        raise NotFoundException("User not found")
-
-    db_user = cast(UserRead, db_user)
-    db_tier = await crud_tiers.get(db=db, id=values.tier_id, schema_to_select=TierRead)
-    if db_tier is None:
-        raise NotFoundException("Tier not found")
-
-    await crud_users.update(db=db, object=values.model_dump(), username=username)
-    return {"message": f"User {db_user.name} Tier updated"}
